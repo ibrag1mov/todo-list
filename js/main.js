@@ -79,12 +79,11 @@ elList.addEventListener('click', (evt)=>{
         const todoId=evt.target.dataset.todoId;
 
         const findedIndex = todos.findIndex((item) => item.id == todoId);
+        const findedItem = todos.find((item)=> item.id == todoId);
 
         todos.splice(findedIndex, 1);
         
         elAllSpan.textContent = todos.length;
-
-
 
         renderTodo(todos, elList)
         
@@ -117,6 +116,7 @@ elList.addEventListener('click', (evt)=>{
 })
 
 elGroupBtn.addEventListener('click', (evt)=>{
+    evt.preventDefault();
    if(evt.target.matches('.btn-primary')){
     renderTodo(todos, elList)
     }
@@ -128,7 +128,7 @@ elGroupBtn.addEventListener('click', (evt)=>{
             renderTodo(newFilterTodo, elList)
         }
     }
-    if(evt.target.matches('.btn-danger')){
+    if(evt.target.matches('.btn-secondary')){
         if(elCompletedSpan.textContent != 0){
             const newFilterTodo=todos.filter((el)=> el.isCompleted==false);
             elUnCompletedSpan.textContent = newFilterTodo.length;
