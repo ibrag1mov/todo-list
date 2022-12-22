@@ -1,50 +1,138 @@
-let elForm=document.querySelector('.js-form');
-let elInput=document.querySelector('.js-input');
-let elList=document.querySelector('.js-list');
+const elForm=document.querySelector('.js-form');
+const elInput=document.querySelector('.js-input');
+const elList=document.querySelector('.js-list');
+const elGroupBtn=document.querySelector('.js-group-btn');
+const elAllSpan=document.querySelector('#js-all-span');
+const elCompletedSpan=document.querySelector('#js-completed');
+const elUnCompletedSpan=document.querySelector('#js-un-completed');
 
-let todos=[];
+
+const todos=[];
+var check=0;
+
+const renderTodo = (array, node)=>{
+    node.innerHTML='';
+    array.forEach((item)=>{
+        const newItem = document.createElement('li');
+        const newInput = document.createElement('input');
+        const newSpan=document.createElement('span');
+        const newEditBtn=document.createElement('button');
+        const newDeleteBtn=document.createElement('button');
+
+        newItem.setAttribute('class', 'd-flex list-group-item align-items-center js-item ');
+        newSpan.setAttribute('class', 'w-75 mx-4')
+        newInput.setAttribute('class', ' form-check-input m-0 js-check');
+        newEditBtn.setAttribute('class', 'btn bg-light bg-gradient me-2 shadow js-edit-btn');
+        newDeleteBtn.setAttribute('class', 'btn bg-danger text-white bg-gradient shadow js-delete-btn');
+
+        newSpan.textContent =item.text;
+        newInput.type = 'checkbox';
+        newEditBtn.innerHTML = `<i class="bi bi-pen  pe-none"></i>`;
+        newDeleteBtn.innerHTML = `<i class="bi bi-x-lg pe-none"></i>`;
+        newEditBtn.dataset.todoId = item.id;
+        newDeleteBtn.dataset.todoId = item.id;
+        newInput.dataset.todoId = item.id;
+
+        newItem.appendChild(newInput);
+        newItem.appendChild(newSpan);
+        newItem.appendChild(newEditBtn);
+        newItem.appendChild(newDeleteBtn);
+
+        if(item.isCompleted){
+            newInput.checked = true;
+            newSpan.style.textDecoration = 'line-through'
+        }
+
+       
+  
+
+        node.appendChild(newItem);
+    });
+};
 
 elForm.addEventListener('submit', (evt)=>{
     evt.preventDefault();
+    if(elInput.value != ''){
+        let elInputValue = elInput.value;
+        elInput.value='';
+    
+    
+        const newTodo = {
+            id: todos.length > 0 ? todos[todos.length-1].id + 1 : 1,
+            text: elInputValue,
+            isCompleted: false,
+        };
+
+        todos.push(newTodo);
+        elUnCompletedSpan.textContent=todos.length;
+        elAllSpan.textContent = todos.length;
+
+        renderTodo(todos, elList)
+       
+    };
   
-    // const obj{
-    //     id: todos.length > 0 ? todos[todos.length-1].id + 1:1;
-    //     text: elInput.value;
+});
 
-    // }
+elList.addEventListener('click', (evt)=>{
 
-    let elItem=document.createElement('li');
-    let elChekbox = document.createElement('input');
-    let elSpan=document.createElement('span');
-    let elEditBtn=document.createElement('button');
-    let elDeleteBtn=document.createElement('button');
+    if(evt.target.matches('.js-delete-btn')){
+        const todoId=evt.target.dataset.todoId;
 
-    elItem.setAttribute('class', 'd-flex list-group-item align-items-center js-item ');
-    elSpan.setAttribute('class', 'w-75 mx-4')
-    elChekbox.setAttribute('type', 'checkbox');
-    elChekbox.setAttribute('class', ' form-check-input m-0');
-    elEditBtn.setAttribute('class', 'btn btn-warning me-2');
-    elDeleteBtn.setAttribute('class', 'btn btn-danger ');
+        const findedIndex = todos.findIndex((item) => item.id == todoId);
+
+        todos.splice(findedIndex, 1);
+        
+        elAllSpan.textContent = todos.length;
 
 
-    elSpan.textContent=elInput.value;
-    elInput.value=""
-    elEditBtn.textContent="Edit";
-    elDeleteBtn.textContent="Delete";
 
+        renderTodo(todos, elList)
+        
+    }
+    if(evt.target.matches('.js-edit-btn')){
+        const todoId=evt.target.dataset.todoId; //string
+        const findedItem = todos.find((item) => item.id == todoId);
 
-    elItem.appendChild(elChekbox);
-    elItem.appendChild(elSpan);
-    elItem.appendChild(elEditBtn);
-    elItem.appendChild(elDeleteBtn);
-    console.log(elItem);
+        const newText = prompt('Yangi todo kiriting!', findedItem.text)
+        
+        findedItem.text=newText;
+        renderTodo(todos, elList)
+    }
+    if(evt.target.matches('.js-check')){
+        const todoId=evt.target.dataset.todoId; //string
+        const findedItem = todos.find((item)=> item.id == todoId);
+        findedItem.isCompleted = !findedItem.isCompleted;
+        if(findedItem.isCompleted == true){
+            check+=1;
+            
+        }
+        else{
+            check-=1;
+        }
+        elCompletedSpan.textContent = check;
+        elUnCompletedSpan.textContent = todos.length - check;
 
-    elList.appendChild(elItem);
+        renderTodo(todos, elList)
+    }
 })
 
+elGroupBtn.addEventListener('click', (evt)=>{
+   if(evt.target.matches('.btn-primary')){
+    renderTodo(todos, elList)
+    }
+    if(evt.target.matches('.btn-success')){
 
-
-
-
-
-// id:todos.length > 0 ? todos[todos.length-1].id + 1:1;
+        if(elCompletedSpan.textContent != 0){
+            const newFilterTodo=todos.filter((el)=> el.isCompleted==true);
+            elCompletedSpan.textContent = newFilterTodo.length;
+            renderTodo(newFilterTodo, elList)
+        }
+    }
+    if(evt.target.matches('.btn-danger')){
+        if(elCompletedSpan.textContent != 0){
+            const newFilterTodo=todos.filter((el)=> el.isCompleted==false);
+            elUnCompletedSpan.textContent = newFilterTodo.length;
+            renderTodo(newFilterTodo, elList)
+        }
+    }
+})
