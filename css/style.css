@@ -5,3 +5,14 @@
     scroll-behavior: smooth;
 }
 
+body{
+    height: 100vh;
+    background-image: linear-gradient(to top, #0e4976, #1b4063, #203650, #212e3e, #20252d) ;
+    background-repeat: no-repeat;
+    background-size: cover !important;
+    background-position: center !important;
+}
+
+.title{
+    font-size: 50px !important;
+}
