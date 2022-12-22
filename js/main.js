@@ -1,14 +1,16 @@
 const elForm=document.querySelector('.js-form');
 const elInput=document.querySelector('.js-input');
 const elList=document.querySelector('.js-list');
-const elGroupBtn=document.querySelector('.js-group-btn');
 const elAllSpan=document.querySelector('#js-all-span');
 const elCompletedSpan=document.querySelector('#js-completed');
 const elUnCompletedSpan=document.querySelector('#js-un-completed');
+const elBtnAll=document.querySelector('.js-all');
+const elBtnCompleted=document.querySelector('.js-completed');
+const elBtnUnCompleted=document.querySelector('.js-un-completed');
 
 
 const todos=[];
-var check=0;
+
 
 const renderTodo = (array, node)=>{
     node.innerHTML='';
@@ -48,7 +50,12 @@ const renderTodo = (array, node)=>{
 
         node.appendChild(newItem);
     });
+
+    elAllSpan.textContent = todos.length;
+
 };
+
+
 
 elForm.addEventListener('submit', (evt)=>{
     evt.preventDefault();
@@ -64,13 +71,11 @@ elForm.addEventListener('submit', (evt)=>{
         };
 
         todos.push(newTodo);
-        elUnCompletedSpan.textContent=todos.length;
         elAllSpan.textContent = todos.length;
+        elUnCompletedSpan.textContent=todos.length;
 
         renderTodo(todos, elList)
-       
     };
-  
 });
 
 elList.addEventListener('click', (evt)=>{
@@ -79,11 +84,14 @@ elList.addEventListener('click', (evt)=>{
         const todoId=evt.target.dataset.todoId;
 
         const findedIndex = todos.findIndex((item) => item.id == todoId);
-        const findedItem = todos.find((item)=> item.id == todoId);
 
         todos.splice(findedIndex, 1);
+
+        let todoFilter = todos.filter((item) => item.isCompleted == true);
         
-        elAllSpan.textContent = todos.length;
+        elCompletedSpan.textContent = todoFilter.length;
+        elUnCompletedSpan.textContent = elAllSpan.textContent - elCompletedSpan.textContent - 1;
+  
 
         renderTodo(todos, elList)
         
@@ -95,44 +103,49 @@ elList.addEventListener('click', (evt)=>{
         const newText = prompt('Yangi todo kiriting!', findedItem.text)
         
         findedItem.text=newText;
+
+        let todoFilter = todos.filter((item) => item.isCompleted == true);
+        elCompletedSpan.textContent = todoFilter.length;
+        elUnCompletedSpan.textContent = elAllSpan.textContent - elCompletedSpan.textContent ;
+
         renderTodo(todos, elList)
     }
     if(evt.target.matches('.js-check')){
         const todoId=evt.target.dataset.todoId; //string
         const findedItem = todos.find((item)=> item.id == todoId);
         findedItem.isCompleted = !findedItem.isCompleted;
-        if(findedItem.isCompleted == true){
-            check+=1;
-            
-        }
-        else{
-            check-=1;
-        }
-        elCompletedSpan.textContent = check;
-        elUnCompletedSpan.textContent = todos.length - check;
 
+        let todoFilter = todos.filter((item) => item.isCompleted == true);
+  
+        elCompletedSpan.textContent = todoFilter.length;
+        elUnCompletedSpan.textContent = elAllSpan.textContent - elCompletedSpan.textContent ;
+        
         renderTodo(todos, elList)
+        
+       
     }
-})
 
-elGroupBtn.addEventListener('click', (evt)=>{
+    let todosCompleted=[];
+    elBtnCompleted.addEventListener('click', (evt)=>{
+        let todoFilter = todos.filter((item) => item.isCompleted == true);
+        todosCompleted.push(todoFilter)
+        renderTodo(todosCompleted[0], elList)
+    });
+    
+    
+    let todosUnCompleted=[];
+    elBtnUnCompleted.addEventListener('click', (evt)=>{
+        let todoFilter = todos.filter((item) => item.isCompleted == false);
+        todosUnCompleted.push(todoFilter);
+        renderTodo(todosUnCompleted[0], elList)
+    })
     evt.preventDefault();
-   if(evt.target.matches('.btn-primary')){
-    renderTodo(todos, elList)
-    }
-    if(evt.target.matches('.btn-success')){
+});
 
-        if(elCompletedSpan.textContent != 0){
-            const newFilterTodo=todos.filter((el)=> el.isCompleted==true);
-            elCompletedSpan.textContent = newFilterTodo.length;
-            renderTodo(newFilterTodo, elList)
-        }
-    }
-    if(evt.target.matches('.btn-secondary')){
-        if(elCompletedSpan.textContent != 0){
-            const newFilterTodo=todos.filter((el)=> el.isCompleted==false);
-            elUnCompletedSpan.textContent = newFilterTodo.length;
-            renderTodo(newFilterTodo, elList)
-        }
-    }
+
+
+
+elBtnAll.addEventListener('click', (evt)=>{
+    renderTodo(todos, elList);
 })
+
